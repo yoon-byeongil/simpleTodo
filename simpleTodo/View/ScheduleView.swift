@@ -8,14 +8,23 @@ struct ScheduleView: View {
         NavigationStack {
             List {
                 ForEach(viewModel.items) { item in
-                    HStack {
-                        Image(systemName: item.isCompleted ? "checkmark.circle.fill" : "circle")
-                            .onTapGesture {
-                                viewModel.toggleCompletion(item: item)
-                            }
-                        Text(item.title)
-                            .strikethrough(item.isCompleted)
-                            .foregroundColor(item.isCompleted ? .gray : .primary)
+                    VStack(alignment: .leading) {
+                        HStack {
+                            Image(systemName: item.isCompleted ? "checkmark.circle.fill" : "circle")
+                                .onTapGesture {
+                                    viewModel.toggleCompletion(item: item)
+                                }
+                            Text(item.title)
+                                .strikethrough(item.isCompleted)
+                                .foregroundColor(item.isCompleted ? .gray : .primary)
+                        }
+                        // 알람 시간 표시
+                        if let alarm = item.alarmDate {
+                            Text("🔔 " + formattedDate(alarm))
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                                .padding(.leading, 30)
+                        }
                     }
                 }
                 .onDelete(perform: viewModel.deleteItem)
@@ -32,6 +41,13 @@ struct ScheduleView: View {
                 }
             }
         }
+    }
+    
+    /// 날짜 포맷 함수
+    func formattedDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy.MM.dd HH:mm"
+        return formatter.string(from: date)
     }
 }
 
