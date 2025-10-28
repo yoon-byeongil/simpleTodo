@@ -2,17 +2,23 @@ import SwiftUI
 
 struct SettingsView: View {
     var openMenu: () -> Void
-    @State private var allowNotifications = false
-    @State private var isDarkMode = false
-    @State private var autoDelete = false
+    @EnvironmentObject var viewModel: ScheduleViewModel
 
     var body: some View {
         NavigationStack {
             Form {
                 Section(header: Text("설정")) {
-                    Toggle("알림", isOn: $allowNotifications)
-                    Toggle("다크 모드", isOn: $isDarkMode)
-                    Toggle("완료된 항목 자동 삭제", isOn: $autoDelete)
+                    // 알림 허용
+                    Toggle("알림 허용", isOn: $viewModel.allowNotifications)
+                        .onChange(of: viewModel.allowNotifications) {
+                            viewModel.toggleNotificationPermission()
+                        }
+                    
+                    // 다크 모드
+                    Toggle("다크 모드", isOn: $viewModel.isDarkMode)
+                    
+                    // 완료된 항목 자동 삭제
+                    Toggle("완료된 항목 자동 삭제", isOn: $viewModel.autoDeleteCompleted)
                 }
                 
                 Section {
@@ -33,10 +39,14 @@ struct SettingsView: View {
                     }
                 }
             }
+            .onAppear {
+                viewModel.refreshNotificationStatus()
+            }
         }
     }
 }
 
 #Preview {
     SettingsView(openMenu: {})
+        .environmentObject(ScheduleViewModel())
 }
