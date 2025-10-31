@@ -32,6 +32,21 @@ final class ScheduleViewModel: ObservableObject {
         requestNotificationPermission()
         refreshNotificationStatus()
         applyDarkMode() // 앱 실행 시 현재 모드 적용
+        observeAppLifecycle()
+    }
+    
+    // MARK: - 앱 포그라운드 감시
+    private func observeAppLifecycle() {
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.willEnterForegroundNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self = self else { return }
+            Task { @MainActor in
+                self.refreshNotificationStatus()
+            }
+        }
     }
     
     // MARK: - 일정 추가
